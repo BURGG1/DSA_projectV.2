@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <string>
+#include<sstream>
 #include <gotoxy.h>
 #include <conio.h>
 using namespace std;
@@ -47,7 +49,7 @@ void table(int h, int x, int y) {// unang parameter para sa height ng table, nex
 		gotoxy(x + 38 + 11,  y + 9 + a); cout << char(179);//Author
 		gotoxy(x + 53 + 11, y + 9 + a); cout << char(179);//Availability/Year
 		gotoxy(x + 63 + 10, y + 9 + a); cout << char(179);//Location
-		gotoxy(x + 85 + 8, y + 9 + a); cout << char(179);//ISBN
+		gotoxy(x + 87 + 8, y + 9 + a); cout << char(179);//ISBN
 		gotoxy(x + 116, y + 9 + a); cout << char(179);//Right_side
 	}
 	gotoxy(x + 2, h + 9 + y); cout << char(192) << string(113, char(196)) << char(217);//Bottom
@@ -223,7 +225,11 @@ void table(int h, int x, int y) {// unang parameter para sa height ng table, nex
 
 int main() { // *di pa to tapos 
 
-	int counter = 1;
+	string searchbook[32];
+	string search;
+	char d;
+	bool print = false;
+	int counter = 0;
 
 	// problem is pano pagkakasyahin yung apat na function dito sa isang option :> HHAHAHAHAHAHAHAHAHAH
 M:
@@ -232,47 +238,192 @@ M:
 	gotoxy(70, 4); cout << char(192) << string(37, char(196)) << char(217);
 
 	table(10, 1, 1);
-	button(4, 5, 14, "A-Z");
-	button(60, 25, 15, "Delete");
-	button(80, 25, 14, "Edit");
-	button(99, 25, 14, "Back");
+	/*c(7); button(4, 5, 14, "A-Z");*/
+	c(7); button(60, 25, 15, "Delete");
+	c(7); button(80, 25, 14, "Edit");
+	c(7); button(99, 25, 14, "Back");
+	gotoxy(80, 3); cout << string(15, ' ');
 
 
-
-	switch (_getch()) {
-	case 224:
-		switch (_getch()) {
-		case 72:case 75:
-			if (counter <= 1) { counter = 7; }
-			else counter--;
-			break;
-		case 80:case 77:
-			if (counter > 6) { counter = 1; }
-			else counter++;
-			break;
-		}
-		goto M;
-		break;
-	case 13:
+	/*for (int i = 0;;) {
 		switch (counter) {
+		case 0:
+			gotoxy(80, 3);
+			for (int j = 0;;) {
+				d = _getch();
+				if (d == -32) {
+					d = _getch();
+					if (d == 72 || d == 75) {
+						counter = 3;
+						break;
+					}
+					else if (d == 80 || d == 77) {
+						counter++;
+						break;
+					}
+				}
+				else if (d == 8 && j >= 1) {
+					cout << "\b \b";
+					searchbook[--j] = '\0';
+				}
+				else if ((d >= 'A' && d <= 'Z') || (d >= 'a' && d <= 'z') || d == ' ' && j < 32) {
+					coorxy(80 + j, 3); cout << d;
+					searchbook[j] = d;
+					++j;
+				}
+				else if (d == 13) {
+					counter++;
+					searchbook[j] = '\0';
+					for (int k = 0; k < 32; k++) { // converting string array searchpoolnum[32] to single value finder
+						search += searchbook[k];
+					}
+					gotoxy(1, 1); cout << search;
+					ifstream Record("Book_Record.txt");
+					if (Record.is_open()) {
+						string title, author, availability, year, location, callno;
+						while (getline(Record, title)) {
+							getline(Record, author);
+							getline(Record, availability);
+							getline(Record, year);
+							getline(Record, location);
+							getline(Record, callno);
+							if (title == search || author == search) {
+
+								gotoxy(6, 12); cout << title << endl;
+								gotoxy(28, 12); cout << author << endl;
+								gotoxy(52, 12); cout << availability << endl;
+								gotoxy(63, 12); cout << year << endl;
+								gotoxy(82, 12); cout << location << endl;
+								gotoxy(102, 12); cout << callno << endl;
+
+								print = true;
+
+							}
+						}
+						Record.close();
+					}
+					else {
+						if (!print) {
+
+							cout << "Unable to open file!" << endl;
+						}
+
+					}
+					break;
+				}
+			}
+			break;
 		case 1:
+			c(4); button(60, 25, 15, "");
+			for (int j = 0;;) {
+				d = _getch();
+				if (d == -32) {
+					d = _getch();
+					if (d == 72 || d == 75) {
+						counter--;
+						break;
+					}
+					else if (d == 80 || d == 77) {
+						counter++;
+						break;
+					}
+				}
+			}
+			goto M;
 			break;
 		case 2:
+			c(4); button(80, 25, 14, "");
+			for (int j = 0;;) {
+				d = _getch();
+				if (d == -32) {
+					d = _getch();
+					if (d == 72 || d == 75) {
+						counter--;
+						break;
+					}
+					else if (d == 80 || d == 77) {
+						counter++;
+						break;
+					}
+				}
+			}
+			goto M;
 			break;
 		case 3:
+			c(4); button(99, 25, 14, "");
+			for (int j = 0;;) {
+				d = _getch();
+				if (d == -32) {
+					d = _getch();
+					if (d == 72 || d == 75) {
+						counter--;
+						break;
+					}
+					else if (d == 80 || d == 77) {
+						counter = 0;
+						break;
+					}
+				}
+			}
+			goto M;
 			break;
+		}
+	}*/
+	
+	
+	
+	
+	
+	gotoxy(81, 3); getline(cin, search);
+
+	ifstream Record("Book_Record.txt");
+	if (Record.is_open()) {
+		string title, author, availability, year, location, callno;
+		while (getline(Record, title)) {
+			getline(Record, author);
+			getline(Record, availability);
+			getline(Record, year);
+			getline(Record, location);
+			getline(Record, callno);
 
 
+			if (title == search || author == search) {
+
+
+				gotoxy(6, 12); cout << title << endl;
+				gotoxy(28, 12); cout << author << endl;
+				gotoxy(68, 12); cout << availability << endl;
+				gotoxy(55, 12); cout << year << endl;
+				gotoxy(76, 12); cout << location << endl;
+				gotoxy(99, 12); cout << callno << endl;
+
+				print = true;
+
+			}
 
 		}
+		Record.close();
 	}
 
+	else {
 
+		cout << "Unable to open file!" << endl;
+	}
+	if (!print) {
+		cout << "Book not found" << endl;
+	}
+	
 
-
-
-
-
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	gotoxy(0, 29);	system("pause");
-
 }
+
+	
