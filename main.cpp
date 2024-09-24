@@ -9,7 +9,7 @@ using namespace std;
 
 #define gotoxy coorxy
 
-void c(int c) {
+void c(int c) { // color lang ya
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), c);
 }
 
