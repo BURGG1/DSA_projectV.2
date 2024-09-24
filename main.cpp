@@ -230,8 +230,6 @@ int main() { // *di pa to tapos
 	char d;
 	bool print = false;
 	int counter = 0;
-
-	// problem is pano pagkakasyahin yung apat na function dito sa isang option :> HHAHAHAHAHAHAHAHAHAH
 M:
 	gotoxy(70, 2); cout << char(218) << string(37, char(196)) << char(191);
 	gotoxy(70, 3); cout << char(179); gotoxy(71, 3); cout << "Search:" << char(179); gotoxy(108, 3); cout << char(179); // search bar
@@ -245,7 +243,7 @@ M:
 	gotoxy(80, 3); cout << string(15, ' ');
 
 
-	/*for (int i = 0;;) {
+	/*for (int i = 0;;) { // search to na nagagamit din yung arrow key, sayang lang di makapag search kahit nakukuha naman yung input || tentative to use
 		switch (counter) {
 		case 0:
 			gotoxy(80, 3);
@@ -274,7 +272,7 @@ M:
 				else if (d == 13) {
 					counter++;
 					searchbook[j] = '\0';
-					for (int k = 0; k < 32; k++) { // converting string array searchpoolnum[32] to single value finder
+					for (int k = 0; k < 32; k++) {
 						search += searchbook[k];
 					}
 					gotoxy(1, 1); cout << search;
@@ -374,8 +372,7 @@ M:
 	
 	
 	
-	gotoxy(81, 3); getline(cin, search);
-
+	gotoxy(81, 3); getline(cin, search); // eto galing sa project || goods na gumagana
 	ifstream Record("Book_Record.txt");
 	if (Record.is_open()) {
 		string title, author, availability, year, location, callno;
@@ -385,28 +382,19 @@ M:
 			getline(Record, year);
 			getline(Record, location);
 			getline(Record, callno);
-
-
 			if (title == search || author == search) {
-
-
 				gotoxy(6, 12); cout << title << endl;
 				gotoxy(28, 12); cout << author << endl;
 				gotoxy(68, 12); cout << availability << endl;
 				gotoxy(55, 12); cout << year << endl;
 				gotoxy(76, 12); cout << location << endl;
 				gotoxy(99, 12); cout << callno << endl;
-
 				print = true;
-
 			}
-
 		}
 		Record.close();
 	}
-
 	else {
-
 		cout << "Unable to open file!" << endl;
 	}
 	if (!print) {
