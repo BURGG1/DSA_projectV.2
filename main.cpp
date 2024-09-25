@@ -6,8 +6,9 @@
 #include <gotoxy.h> // ibahin nalang din if di nagana
 #include <conio.h>
 using namespace std;
+// 9/25/24 yung main na search(DONE) patry nalang if goods lang
 
-#define gotoxy coorxy //alisin nyo na to sakin lang merong coorxy na function
+#define gotoxy coorxy //alisin na to sakin lang merong coorxy na function pero gotoxy lang rin naman to
 
 void c(int c) {
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), c);
