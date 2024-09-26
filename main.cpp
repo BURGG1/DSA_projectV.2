@@ -8,9 +8,9 @@
 #include <algorithm>
 using namespace std;
 #include "UI_pack.h"
-#define gotoxy coorxy //alisin nyo na to sakin lang merong coorxy na function
+#define gotoxy coorxy //alisin na to sakin lang kasi may coorxy na function
 
-//int main() { // *SUCCESSFUL! might use if trip nyo
+//int main() { // (DONE) palag natin to if trip nyo
 //
 //	char d;
 //	int counter = 0;
@@ -61,7 +61,7 @@ using namespace std;
 //						searchbook[j] = '\0';
 //						search = string(searchbook);
 //
-//						ifstream Record("TryBook_Record.txt");
+//						ifstream Record("TryBook_Record.txt"); // TRY LANG NA DATABASE
 //						string title, author, availability, year, location, callno;
 //						string line;
 //
@@ -167,7 +167,7 @@ void sorting(){ //SOTING FUNCTIONN
 
 		gotoxy(6, 12 + z); cout << string(15, ' ');
 		gotoxy(28, 12 + z); cout << string(20, ' ');
-	    gotoxy(52, 12 + z); cout << string(8, ' ');
+	        gotoxy(52, 12 + z); cout << string(8, ' ');
 		gotoxy(67, 12 + z); cout << string(4, ' '); // erasing display lang sa table
 		gotoxy(82, 12 + z); cout << string(13, ' ');
 		gotoxy(102, 12 + z); cout << string(15, ' ');
@@ -183,7 +183,7 @@ void sorting(){ //SOTING FUNCTIONN
 
 }
 
-int main() // ViEW ALL and SORING done(di ko sure kung tama)
+int main() // ViEW ALL and SORING (DONE)
 {
 	
     int counter = 1;
