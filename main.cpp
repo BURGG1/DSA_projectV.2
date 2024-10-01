@@ -4,11 +4,11 @@
 #include <vector>
 #include <string>
 #include <conio.h>
-#include <gotoxy.h> // ibahin nalang din if di nagana
+#include <gotoxy.h> // ibahin nalang po to
 #include <algorithm>
 using namespace std;
-//#include "UI_pack.h"
-#define gotoxy coorxy
+
+#define gotoxy coorxy // alisin nalang din po to 
 
 struct Book {
 	string title, author, year, availability, location, isbn;
