@@ -112,7 +112,7 @@ void sorting() { //SOTING FUNCTIONN
 			getline(ss, book.location, '\t');
 			getline(ss, book.isbn, '\t');
 			if (!book.title.empty() && !book.author.empty() && !book.availability.empty() && !book.year.empty() && !book.location.empty() && !book.isbn.empty()) {
-				catalog.push_back(book); // for sorting pushback the variable sa isang variable
+				catalog.push_back(book); 
 			}
 		}
 		Record.close();
