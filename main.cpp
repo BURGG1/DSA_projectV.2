@@ -4,12 +4,13 @@
 #include <vector>
 #include <string>
 #include <conio.h>
-#include <gotoxy.h> // ibahin nalang po to
+#include <gotoxy.h> // ibahin nalang din if di nagana
 #include <algorithm>
 using namespace std;
 
-#define gotoxy coorxy // alisin nalang din po to 
-
+#define gotoxy coorxy // alisin nalang 
+//ctrl + shift + / para mabilis ma-uncomment :>
+// herap pala ng edit function HAHAHAHAHA
 struct Book {
 	string title, author, year, availability, location, isbn;
 	struct Book* next;
@@ -19,7 +20,7 @@ void c(int c) {
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), c);
 }
 
-void button(int x, int y, int l, const string& a)//unang parameter x coord, syempre sunod yung y coord, yung l kung gaanon kalaki yung button, last is yung pangalan
+void button(int x, int y, int l, const string& a, int p)//unang parameter x coord, syempre sunod yung y coord, yung l kung gaanon kalaki yung button, last is yung pangalan
 {
 	gotoxy(x, y); cout << char(201) << string(l, char(205)) << char(187); // top
 	gotoxy(x, y + 1); cout << char(186); coorxy(x + l + 1, y + 1); cout << char(186);// two hori 
@@ -31,6 +32,9 @@ void button(int x, int y, int l, const string& a)//unang parameter x coord, syem
 	}
 	else if (a.length() <= 4 && l <= 15) {
 		c(7); gotoxy(x + l / 2 - 1, y + 1); cout << a;
+	}
+	if (p == 1) {
+		while (_getch() != 13);
 	}
 }
 
@@ -58,41 +62,9 @@ void table(int h, int x, int y) {// unang parameter para sa height ng table, nex
 	gotoxy(x + 2, h + 9 + y); cout << char(192) << string(113, char(196)) << char(217);//Bottom
 }
 
-int getter(string s) {
-	char a;
-	char getter[32];
-	for (int j = 0;;) {
-		a = _getch();
-		if (a == -32) {
-			a = _getch();
-			if (a == 72 || a == 75) {
-				return 10;
-				break;
-			}
-			else if (a == 80 || a == 77) {
-				return 11;
-				break;
-			}
-		}
-		else if (a == 8 && j >= 1) {
-			cout << "\b \b";
-			getter[--j] = '\0';
-		}
-		else if ((a >= 'A' && a <= 'Z') || (a >= 'a' && a <= 'z') || (a == 32 && j < 32)) {
-		    cout << a;
-			getter[j] = a;
-			++j;
-		}
-		else if (a == 13) {
-			getter[j] = '\0';
-			s = string(getter);
-			return 10;
-		}
-	}
-}
 
 
-bool compare(const Book a, const Book b) { // SORTING CONDITION pwede pa dito mag add if want by category
+bool compare(const Book a, const Book b) { // SORTING TO CONDITION
 	return a.title < b.title;
 }
 
@@ -112,7 +84,7 @@ void sorting() { //SOTING FUNCTIONN
 			getline(ss, book.location, '\t');
 			getline(ss, book.isbn, '\t');
 			if (!book.title.empty() && !book.author.empty() && !book.availability.empty() && !book.year.empty() && !book.location.empty() && !book.isbn.empty()) {
-				catalog.push_back(book); 
+				catalog.push_back(book); // for sorting pushback the variable sa isang variable
 			}
 		}
 		Record.close();
@@ -143,13 +115,46 @@ void sorting() { //SOTING FUNCTIONN
 
 }
 
-void edit(string s) { // not yet done ARROW KEY TAPOS FLOW (baka di pa magamit) HAHAHAHAHA
+int getter(string& s) {
+	char a;
+	char getter[32];
+	for (int j = 0;;) {
+		a = _getch();
+		if (a == -32) {
+			a = _getch();
+			if (a == 72 || a == 75) {
+				return 10;
+				break;
+			}
+			else if (a == 80 || a == 77) {
+				return 11;
+				break;
+			}
+		}
+		else if (a == 8 && j >= 1) {
+			cout << "\b \b";
+			getter[--j] = '\0';
+		}
+		else if ((a >= 'A' && a <= 'Z') || (a >= 'a' && a <= 'z') || (a >= '0' && a <= '9') || (a == 32 && j < 32)) {
+			cout << a;
+			getter[j] = a;
+			++j;
+		}
+		else if (a == 13) {
+			getter[j] = '\0';
+			s = string(getter);
+			return 11;
+		}
+	}
+}
 
+void edit(string s) { // not yet done ARROW KEY TAPOS FLOW 
+	string titlesearch;
 	int ecount = 1, ecounter = 1;
 	string title, author, availability, year, location, callno;
 	string ntitle, nauthor, navailability, nyear, nlocation, ncallno;
 
-	fstream Record("T_Book_Record.txt", ios::out | ios::in);
+	fstream Record("T_Book_Record.txt", ios::ate | ios::in);
 	string line;
 	int y = 0;
 	if (Record.is_open()) {
@@ -173,6 +178,190 @@ void edit(string s) { // not yet done ARROW KEY TAPOS FLOW (baka di pa magamit) 
 			}
 		}
 		Record.close();
+
+
+	confi:
+		gotoxy(45, 1); cout << "Are you sure do you want to update this information?";
+		//cin >> ecount;
+		c(7); button(45, 3, 10, "yes", 0);
+		c(7); button(60, 3, 10, "no", 0);
+
+		if (ecount == 1) {
+			gotoxy(43, 3); cout << ">";
+			gotoxy(58, 3); cout << "<";
+		}
+		else if (ecount == 2) {
+			gotoxy(58, 3); cout << ">";
+			gotoxy(72, 3); cout << "<";
+		}
+
+		switch (_getch()) {
+		case 224:
+			switch (_getch()) {
+			case 72:case 77:
+				if (ecount < 1) { ecount = 2; }
+				else ecount--;
+				break;
+			case 80:case 75:
+				if (ecount > 2) { ecount = 1; }
+				else ecount++;
+				break;
+			}
+			goto confi;
+			break;
+		case 13:
+			switch (ecount) {
+			case 1:
+				int b;
+
+			s:
+
+				switch (ecounter) {
+				case 1:
+					gotoxy(5, 16); b = getter(ntitle);
+					/*gotoxy(5, 12); cout << string(20, ' ');*/
+					gotoxy(5, 16); cout << ntitle;
+					if (b == 10) {
+						if (ecounter < 1) ecount = 6;
+						else ecounter--;
+					}
+					else ecounter++;
+					goto s;
+					break;
+				case 2:
+					gotoxy(28, 16); b = getter(nauthor);
+					/*gotoxy(28, 12); cout << string(20, ' ');*/
+					gotoxy(28, 16); cout << nauthor;
+					if (b == 10) ecounter--;
+					else ecounter++;
+					goto s;
+					break;
+				case 3:
+					gotoxy(52, 16); b = getter(navailability);
+					//gotoxy(52, 12); cout << string(8, ' ');
+					gotoxy(52, 16); cout << navailability;
+					if (b == 10) ecounter--;
+					else ecounter++;
+					goto s;
+					break;
+				case 4:
+					gotoxy(67, 16); b = getter(nyear);
+					//gotoxy(67, 12); cout << string(4, ' ');
+					gotoxy(67, 16); cout << nyear;
+					if (b == 10) ecounter--;
+					else ecounter++;
+					goto s;
+					break;
+				case 5:
+					gotoxy(82, 16); b = getter(nlocation);
+					//gotoxy(82, 12); cout << string(13, ' ');
+					gotoxy(82, 16); cout << nlocation;
+					if (b == 10) ecounter--;
+					else ecounter++;
+					goto s;
+					break;
+				case 6:
+					gotoxy(102, 16); b = getter(ncallno);
+					//gotoxy(102, 12); cout << string(16, ' ');
+					gotoxy(102, 16); cout << ncallno;
+					if (b == 10) ecounter--;
+					else ecounter++;
+					goto s;
+					break;
+				case 7:
+					gotoxy(5, 18); cout << ntitle;
+					gotoxy(28, 18); cout << nauthor;
+					gotoxy(52, 18);	cout << navailability;
+					gotoxy(67, 18); cout << nyear;
+					gotoxy(82, 18); cout << nlocation;
+					gotoxy(102, 18); cout << ncallno;
+
+					button(45, 23, 15, "Confirm", 1);
+
+					if (title == s) { //  DI PA MAKAPAG EDIT SA MISMONG DATABASE
+						title = ntitle;
+						author = nauthor;
+						availability = navailability;
+						year = nyear;
+						location = nlocation;
+						callno = ncallno;
+
+						fstream nRecord("T_Book_Record.txt", ios::ate | ios::in);
+						if (nRecord.is_open())
+						{
+
+							cout << "Book successfully edited!";
+							nRecord << title << '\t' << author << '\t' << availability << '\t'
+								<< year << '\t' << location << '\t' << callno << endl;
+						}
+						else {
+							cout << "Book cannot be edit!";
+						}
+
+					}
+					else {
+						gotoxy(80, 5); cout << "Unable to open file!" << endl;
+						Sleep(500);
+						gotoxy(80, 5); cout << string(25, ' ');
+					}
+
+
+					/*Book* first = NULL;
+					Book* newAdd = new Book;
+
+					newAdd->title = ntitle;
+					newAdd->author = nauthor;
+					newAdd->availability = navailability;
+					newAdd->year = nyear;
+					newAdd->location = nlocation;
+					newAdd->isbn = ncallno;
+					newAdd->next = NULL;
+
+					Book* newAdd2;
+					if (first == NULL) {
+						first = newAdd;
+					}
+					else {
+						newAdd2 = first;
+						while (newAdd2->next) newAdd2 = newAdd2->next;;
+						newAdd2 = newAdd;
+					}
+					Book* update = first;
+					fstream Record;
+					if (s == title) {
+
+						Record.open("T_Book_Record.txt", ios::ate | ios:: out | ios :: in);
+						if (Record.is_open()) {
+							gotoxy(45, 3); cout << "Book Successfully Added!";
+
+							while (update) {
+								Record << update->title << '\t' << update->author << '\t' << update->availability << '\t'
+									<< update->year << '\t' << update->location << '\t' << update->isbn << endl;
+								update = update->next;
+							}
+
+
+							Record.close();
+						}
+						else {
+							gotoxy(45, 3); gotoxy(45, 3); cout << "Unable to add Book!";
+						}
+					}
+					else {
+						gotoxy(45, 3); cout << "Title didn't match";
+					}*/
+
+					break;
+				}
+				break;
+			case 2:
+				cout << "Ayaw gumana bes";
+				break;
+			}
+
+		}
+
+
 	}
 	else {
 		gotoxy(80, 5); cout << "Unable to open file!" << endl;
@@ -182,120 +371,7 @@ void edit(string s) { // not yet done ARROW KEY TAPOS FLOW (baka di pa magamit) 
 
 
 
-confi:
-	gotoxy(1, 1); cout << "Are you sure do you want to update this information?";
-	//cin >> ecount;
-	c(7); button(1, 3, 10, "yes");
-	c(7); button(15, 3, 10, "no");
 
-	if (ecount == 1) {
-		c(4); button(1, 3, 10, "");
-	}
-	else if (ecount == 2) {
-		c(4); button(15, 3, 10, "");
-	}
-
-	switch (_getch()) {
-	case 224:
-		switch (_getch()) {
-		case 72:case 77:
-			if (ecount < 1) { ecount = 2; }
-			else ecount--;
-			break;
-		case 80:case 75:
-			if (ecount > 2) { ecount = 1; }
-			else ecount++;
-			break;
-		}
-		goto confi;
-		break;
-	case 13: 
-		switch (ecount) {
-		case 1:
-			int b;
-
-		s:
-
-			switch (ecounter) {
-			case 1:
-				gotoxy(5, 12); b = getter(ntitle);
-				gotoxy(5, 12); cout << string(20, ' ');
-				gotoxy(5, 12); cout << ntitle;
-				if (b == 10) {
-					if (ecounter < 1) ecount = 6;
-					else ecounter--;
-				}
-				else ecounter++;
-				goto s;
-				break;
-			case 2:
-				gotoxy(28, 12); b = getter(nauthor);
-				gotoxy(28, 12); cout << string(20, ' ');
-				gotoxy(28, 12); cout << ntitle;
-				if (b == 10) ecounter--;
-				else ecounter++;
-				goto s;
-				break;
-			case 3:
-				gotoxy(52, 12); b = getter(navailability);
-				gotoxy(52, 12); cout << string(8, ' ');
-				gotoxy(52, 12); cout << ntitle;
-				if (b == 10) ecounter--;
-				else ecounter++;
-				goto s;
-				break;
-			case 4:
-				gotoxy(67, 12); b = getter(nyear);
-				gotoxy(67, 12); cout << string(4, ' ');
-				gotoxy(67, 12); cout << ntitle;
-				if (b == 10) ecounter--;
-				else ecounter++;
-				goto s;
-				break;
-			case 5:
-				gotoxy(82, 12); b = getter(nlocation);
-				gotoxy(82, 12); cout << string(13, ' ');
-				gotoxy(82, 12); cout << ntitle;
-				if (b == 10) ecounter--;
-				else ecounter++;
-				goto s;
-				break;
-			case 6:
-				gotoxy(102, 12); b = getter(ncallno);
-				gotoxy(102, 12); cout << string(16, ' ');
-				gotoxy(102, 12); cout << ntitle;
-				if (b == 10) ecounter--;
-				else ecounter = 1;
-				goto s;
-				break;
-			case 7:
-
-				/*ofstream Record;
-				Record.open("T_Book_Record.txt", ios::out);
-				if (Record.is_open()) {
-					Record <<
-				}*/
-
-				cout << ntitle;
-				cout << nauthor;
-				cout << navailability;
-				cout << nyear;
-				cout << nlocation;
-				cout << ncallno;
-
-				break;
-			}
-
-			break;
-		case 2:
-			cout << "Ayaw gumana bes";
-			break;
-		}
-
-
-
-	
-	}
 }
 
 
