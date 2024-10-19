@@ -17,6 +17,16 @@ struct Book {
 	struct Book* next;
 };
 
+vector<string> getSuggestions(const vector<string>& suggestions, const string& input) {
+	vector<string> filteredSuggestions;
+	for (const auto& suggestion : suggestions) {
+		if (suggestion.find(input) == 0) { // Check if the suggestion starts with the input
+			filteredSuggestions.push_back(suggestion);
+		}
+	}
+	return filteredSuggestions;
+}
+
 void c(int c) {
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), c);
 }
@@ -113,19 +123,37 @@ void search() { // goods na (SEARCH!)
 
 	table(3, 1, 1);
 	char d;
-	int counter = 0;
-	char searchbook[32];
-	string search, tempTitle;
-	bool print = false;
-M:
+	string title, author, availability, year, location, isbn;
+	int counter = 0, y = 0;
+	string searchbook;
+	string search, line;
+	vector<string> sug;
+	ifstream Record("Book_Record.txt");
+	if (Record.is_open()) {
+		while (getline(Record, line)) {
+			stringstream ss(line);
+			getline(ss, title, '\t');
+			getline(ss, author, '\t');
+			getline(ss, availability, '\t');
+			getline(ss, year, '\t');
+			getline(ss, location, '\t');
+			getline(ss, isbn, '\t');
+			sug.push_back(title);  // Store titles
+			sug.push_back(author);  // Store authors
+			sug.push_back(isbn); // Store isbn
+		}
+		Record.close();
+	}
 
+
+M: 
 	gotoxy(70, 2); cout << char(218) << string(37, char(196)) << char(191);
-	gotoxy(70, 3); cout << char(179); gotoxy(71, 3); cout << "Search:" << char(179); gotoxy(108, 3); cout << char(179); // search bar
+	gotoxy(70, 3); cout << char(179);
+	gotoxy(71, 3); cout << "Search:" << char(179);
+	gotoxy(108, 3); cout << char(179);
 	gotoxy(70, 4); cout << char(192) << string(37, char(196)) << char(217);
-
-	c(7); button(100, 5, 14, "Back", 0);
-	gotoxy(80, 3); cout << string(15, ' ');
-
+	gotoxy(80, 3); cout << string(15, ' '); // Clear previous input
+	c(7); button(100, 5, 14, "Back", 0); // BACK
 
 	switch (counter) {
 	case 0:
@@ -144,38 +172,53 @@ M:
 					break;
 				}
 			}
-			else if (d == 8 && j >= 1) {
-				cout << "\b \b";
-				searchbook[--j] = '\0';
+			else if (d == 8 && j > 0) { // Backspace
+				gotoxy(80 + j, 3); cout << "\b \b";
+				searchbook.pop_back();
+				--j;
+				for (int i = 0; i < 4; i++) {
+					gotoxy(80, 5 + i);
+					cout << string(20, ' '); // Clear previous suggestions
+				}
+				gotoxy(80 + j, 3);
 			}
-			else if ((d >= 'A' && d <= 'Z') || (d >= 'a' && d <= 'z') || (d == 32 && j < 32)) {
-				coorxy(80 + j, 3); cout << d;
-				searchbook[j] = d;
+			else if ((d >= 'a' && d <= 'z') || (d >= 'A' && d <= 'Z') || (d == ' ' && j < 32)) {
+				int x = 0;
+				gotoxy(80 + j, 3); cout << d;
+				searchbook += d;
 				++j;
+				auto filtered = getSuggestions(sug, searchbook);
+
+				for (x = 0; x < 4; ++x) {
+					gotoxy(80, 5 + x);
+					cout << string(20, ' '); // Clear suggestion area
+				}
+				x = 0; // Reset x for displaying suggestions
+				for (const auto& suggestion : filtered) {
+					gotoxy(80, 5 + x);
+					cout << suggestion; // Display suggestion
+					x++;
+				}
+				gotoxy(80 + j, 3);
 			}
-			else if (d == 13) {
-				searchbook[j] = '\0';
-				search = string(searchbook);
-
-				Book book;
-
-				ifstream Record("Book_Record.txt");
-				string title = "", author = "", availability = "", year = "", location = "", isbn = "";
-				string line;
-				int y = 0;
-				if (Record.is_open()) {
-					bool found = false; // Flag to if found
-
-					for (int y = 0; y < 5; y++) {
-						gotoxy(5, 12 + y); cout << string(15, ' ');
-						gotoxy(28, 12 + y); cout << string(15, ' ');
-						gotoxy(52, 12 + y); cout << string(8, ' ');
-						gotoxy(67, 12 + y); cout << string(4, ' '); // erasing display lang sa table
-						gotoxy(82, 12 + y); cout << string(13, ' ');
-						gotoxy(102, 12 + y); cout << string(15, ' ');
+			else if (d == 13) { // Enter key
+				for (int x = 0; x < 5; ++x) {
+					gotoxy(80, 5 + x);
+					cout << string(20, ' '); // Clear suggestion area
+				}
+				search = searchbook;
+				ifstream records("Book_Record.txt");
+				if (records.is_open()) {
+					bool found = false;
+					for (int i = 0; i < y; i++) {
+						gotoxy(5, 12 + i); cout << string(15, ' ');
+						gotoxy(28, 12 + i); cout << string(15, ' ');
+						gotoxy(52, 12 + i); cout << string(8, ' ');
+						gotoxy(67, 12 + i); cout << string(4, ' '); // erasing display lang sa table
+						gotoxy(82, 12 + i); cout << string(13, ' ');
+						gotoxy(102, 12 + i); cout << string(15, ' ');
 					}
-
-					while (getline(Record, line)) {
+					while (getline(records, line)) {
 						stringstream ss(line);
 						getline(ss, title, '\t');
 						getline(ss, author, '\t');
@@ -183,9 +226,7 @@ M:
 						getline(ss, year, '\t');
 						getline(ss, location, '\t');
 						getline(ss, isbn, '\t');
-
-						if (title == search || author == search) {
-
+						if (title == search || author == search || isbn == search) {
 							found = true;
 							gotoxy(5, 12 + y); cout << title;
 							gotoxy(28, 12 + y); cout << author;
@@ -194,24 +235,21 @@ M:
 							gotoxy(82, 12 + y); cout << location;
 							gotoxy(102, 12 + y); cout << isbn;
 							y++;
-
 						}
-						d = ' ';
 					}
-					Record.close();
-
+					sug.clear();
+					sug.shrink_to_fit();
+					searchbook = "";
+					records.close();
 					if (!found) {
-						gotoxy(10, 5); c(4); cout << "No results found."; c(7); // Inform user if not found
+						gotoxy(10, 5); c(4); cout << "No results found."; c(7);
 						Sleep(500);
-						d = ' ';
-						gotoxy(80, 3); cout << string(15, ' ');
-						gotoxy(10, 5); cout << string(25, ' ');
+						gotoxy(10, 5); cout << string(25, ' '); // Clear message
 					}
 				}
 				else {
 					gotoxy(80, 5); cout << "Unable to open file!";
 					Sleep(500);
-					gotoxy(80, 3); cout << string(15, ' ');
 					gotoxy(80, 5); cout << string(25, ' ');
 				}
 				break;
@@ -225,10 +263,10 @@ M:
 		switch (_getch()) {
 		case 224:
 			switch (_getch()) {
-			case 72:case 75:
+			case 72: case 75:
 				counter--;
 				break;
-			case 80:case 77:
+			case 80: case 77:
 				counter = 0;
 				break;
 			}
@@ -238,10 +276,12 @@ M:
 			return;
 			break;
 		}
+		hc(0);
 		break;
 	}
 	return;
 }
+	
 
 bool add(int p, int size) { // ADD (SUCCESSFULL)
 
@@ -424,6 +464,7 @@ a:
 		}
 		else {// the rest;
 		s:
+		hc(0);
 			c(7); button(60, 5, 15, "Confirm", 0);
 			c(7); button(80, 5, 15, "Back", 0);
 			switch (kcounter) {
@@ -674,7 +715,7 @@ confi:
 		case 1: // pag yes
 			int b;
 			for (int i = 0; i < 5; i++) {
-				gotoxy(5, 1 + i); cout << string(80, ' ');
+				gotoxy(5, 1 + i); cout << string(100, ' ');
 			}
 			table(3, 1, 7);
 			gotoxy(45, 14); cout << "Input new information";
@@ -747,18 +788,17 @@ confi:
 				else if (w == 2) {
 					c(4); button(40, 4, 15, "Discard", 0);
 				}
-
 				switch (_getch()) {
 				case 224:
 					switch (_getch()) {
 					case 72:case 75:
-						if (w == 1) {
+						if (w <= 1) {
 							w = 2;
 						}
 						else w--;
 						break;
 					case 80:case 77:
-						if (w == 2) {
+						if (w >= 2) {
 							w = 1;
 						}
 						else w++;
@@ -768,21 +808,21 @@ confi:
 					break;
 				case 13:
 					if (w == 1) { // pag yes
+						
 						for (auto& book : tempb) {
 							if (book.title == s) {
 								found = true;
-								cin.ignore();
+								
 								book.title = ntitle;
 								book.author = nauthor;
 								book.availability = navailability;
 								book.year = nyear;
 								book.location = nlocation;
 								book.isbn = nisbn;
-								break;
 							}
 						}
 						if (!found) {
-							gotoxy(80, 5); cout << "Book not found!" << endl;
+							gotoxy(80, 5); cout << "Book not found!";
 							return;
 						}
 						ofstream Record("Book_Record.txt");
@@ -793,10 +833,12 @@ confi:
 									<< book.location << '\t' << book.isbn << '\n';
 							}
 							Record.close();
-							gotoxy(45, 3); cout << "Book successfully edited!" << endl;
+							gotoxy(25, 1); cout << "Book successfully edited!";
+							Sleep(1000);
+							break;
 						}
 						else {
-							cout << "Unable to open file for writing!" << endl;
+							cout << "Unable to open file for writing!";
 						}
 						break;
 					}
@@ -804,8 +846,8 @@ confi:
 						return;
 						break;
 					}
+					break;
 				}
-				goto s;
 				break;
 			}
 			break;
@@ -1114,36 +1156,58 @@ m:
 	}
 }
 
+
+
 void modilete() {
 a:
 	system("cls");
 	char d;
-	int counter = 0, h = 3;
-	char searchbook[32];
-	string search, tempTitle;
-	bool print = false;
-	int y = 0;
-	gotoxy(70, 2); cout << char(218) << string(37, char(196)) << char(191);
-	gotoxy(70, 3); cout << char(179); gotoxy(71, 3); cout << "Search:" << char(179); gotoxy(108, 3); cout << char(179); // search bar
-	gotoxy(70, 4); cout << char(192) << string(37, char(196)) << char(217);
+	string title = "", author = "", availability = "", year = "", location = "", isbn = "";
+	int counter = 0, y = 0, h = 3;
+	string searchbook;
+	string search, line;
+	vector<string> sug;
+	ifstream Record("Book_Record.txt");
+	if (Record.is_open()) {
+		while (getline(Record, line)) {
+			stringstream ss(line);
+			getline(ss, title, '\t');
+			getline(ss, author, '\t');
+			getline(ss, availability, '\t');
+			getline(ss, year, '\t');
+			getline(ss, location, '\t');
+			getline(ss, isbn, '\t');
+			sug.push_back(title);  // Store titles
+			sug.push_back(author);  // Store authors
+			sug.push_back(isbn); // Store isbn
+		}
+		Record.close();
+	}
 
-	
-M:
+M:  
+
+	gotoxy(70, 2); cout << char(218) << string(37, char(196)) << char(191);
+	gotoxy(70, 3); cout << char(179);
+	gotoxy(71, 3); cout << "Search:" << char(179);
+	gotoxy(108, 3); cout << char(179);
+	gotoxy(70, 4); cout << char(192) << string(37, char(196)) << char(217);
+	gotoxy(80, 3); cout << string(15, ' '); // Clear previous input
+
 
 	for (int i = 0; i < y; i++) {
-		gotoxy(4, 12 + y); cout << string(21, ' ');
-		gotoxy(26, 12 + y); cout << string(24, ' ');
-		gotoxy(51, 12 + y); cout << string(14, ' '); //pang erase sa extra lines
-		gotoxy(66, 12 + y); cout << string(8, ' ');
-		gotoxy(75, 12 + y); cout << string(21, ' ');
-		gotoxy(97, 12 + y); cout << string(20, ' ');
+		gotoxy(4, 13 + y); cout << string(21, ' ');
+		gotoxy(26, 13 + y); cout << string(24, ' ');
+		gotoxy(51, 13 + y); cout << string(14, ' '); //pang erase sa extra lines
+		gotoxy(66, 13 + y); cout << string(8, ' ');
+		gotoxy(75, 13 + y); cout << string(21, ' ');
+		gotoxy(97, 13 + y); cout << string(20, ' ');
 	}
-	table(h + y, 1, 1);
-	(7); button(60, 5, 15, "Edit", 0);
-	c(7); button(80, 5, 15, "Delete", 0);
-	c(7); button(100, 5, 14, "Back", 0);
-	gotoxy(80, 3); cout << string(15, ' ');
+	table(h + y, 1, 2);
 
+	(7); button(10, 5, 15, "Edit", 0);
+	c(7); button(30, 5, 15, "Delete", 0);
+	c(7); button(50, 5, 14, "Back", 0);
+	gotoxy(80, 3); cout << string(15, ' ');
 
 	switch (counter) {
 	case 0:
@@ -1154,7 +1218,7 @@ M:
 			if (d == -32) {
 				d = _getch();
 				if (d == 72 || d == 75) {
-					counter = 3;
+					counter = 1;
 					break;
 				}
 				else if (d == 80 || d == 77) {
@@ -1162,38 +1226,53 @@ M:
 					break;
 				}
 			}
-			else if (d == 8 && j >= 1) {
-				cout << "\b \b";
-				searchbook[--j] = '\0';
+			else if (d == 8 && j > 0) { // Backspace
+				gotoxy(80 + j, 3); cout << "\b \b";
+				searchbook.pop_back();
+				--j;
+				for (int i = 0; i < 5; i++) {
+					gotoxy(80, 5 + i);
+					cout << string(20, ' '); // Clear previous suggestions
+				}
+				gotoxy(80 + j, 3);
 			}
-			else if ((d >= 'A' && d <= 'Z') || (d >= 'a' && d <= 'z') || (d == 32 && j < 32)) {
-				coorxy(80 + j, 3); cout << d;
-				searchbook[j] = d;
+			else if ((d >= 'a' && d <= 'z') || (d >= 'A' && d <= 'Z') || (d == ' ' && j < 32)) {
+				int x = 0;
+				gotoxy(80 + j, 3); cout << d;
+				searchbook += d;
 				++j;
+				auto filtered = getSuggestions(sug, searchbook);
+
+				for (x = 0; x < 5; ++x) {
+					gotoxy(80, 5 + x);
+					cout << string(20, ' '); // Clear suggestion area
+				}
+				x = 0; // Reset x for displaying suggestions
+				for (const auto& suggestion : filtered) {
+					gotoxy(80, 5 + x);
+					cout << suggestion; // Display suggestion
+					x++;
+				}
+				gotoxy(80 + j, 3);
 			}
-			else if (d == 13) {
-				searchbook[j] = '\0';
-				search = string(searchbook);
-
-				Book book;
-				
-				ifstream Record("Book_Record.txt");
-				string title = "", author = "", availability = "", year = "", location = "", isbn = "";
-				string line;
-				y = 0;
-				if (Record.is_open()) {
-					bool found = false; // Flag to if found
-					
-					for (int y = 0; y < h; y++) {
-						gotoxy(5, 12 + y); cout << string(15, ' ');
-						gotoxy(28, 12 + y); cout << string(15, ' ');
-						gotoxy(52, 12 + y); cout << string(8, ' ');
-						gotoxy(67, 12 + y); cout << string(4, ' '); // erasing display lang sa table
-						gotoxy(82, 12 + y); cout << string(13, ' ');
-						gotoxy(102, 12 + y); cout << string(15, ' ');
+			else if (d == 13) { // Enter key
+				for (int x = 0; x < 5; ++x) {
+					gotoxy(80, 5 + x);
+					cout << string(20, ' '); // Clear suggestion area
+				}
+				search = searchbook;
+				ifstream record("Book_Record.txt");
+				if (record.is_open()) {
+					bool found = false;
+					for (int i = 0; i < y; i++) {
+						gotoxy(5, 13 + i); cout << string(15, ' ');
+						gotoxy(28, 13 + i); cout << string(15, ' ');
+						gotoxy(52, 13 + i); cout << string(8, ' ');
+						gotoxy(67, 13 + i); cout << string(4, ' '); // erasing display lang sa table
+						gotoxy(82, 13 + i); cout << string(13, ' ');
+						gotoxy(102, 13 + i); cout << string(15, ' ');
 					}
-
-					while (getline(Record, line)) {
+					while (getline(record, line)) {
 						stringstream ss(line);
 						getline(ss, title, '\t');
 						getline(ss, author, '\t');
@@ -1201,34 +1280,32 @@ M:
 						getline(ss, year, '\t');
 						getline(ss, location, '\t');
 						getline(ss, isbn, '\t');
-
-						if (title == search || author == search) {
-
+						if (title == search || author == search || isbn == search) {
 							found = true;
-							gotoxy(5, 12 + y); cout << title;
-							gotoxy(28, 12 + y); cout << author;
-							gotoxy(52, 12 + y); cout << availability;
-							gotoxy(67, 12 + y); cout << year;
-							gotoxy(82, 12 + y); cout << location;
-							gotoxy(102, 12 + y); cout << isbn;
+							gotoxy(5, 13 + y); cout << title;
+							gotoxy(28, 13 + y); cout << author;
+							gotoxy(52, 13 + y); cout << availability;
+							gotoxy(67, 13 + y); cout << year;
+							gotoxy(82, 13 + y); cout << location;
+							gotoxy(102, 13 + y); cout << isbn;
 							y++;
 						}
-						d = ' ';
-					}
-					Record.close();
 
+					}
+					sug.clear();
+					sug.shrink_to_fit();
+					searchbook = "";
+					record.close();
 					if (!found) {
-						gotoxy(10, 5); c(4); cout << "No results found."; c(7); // Inform user if not found
-						Sleep(1000);
-						d = ' ';
-						gotoxy(10, 5); cout << string(25, ' ');
-						gotoxy(80, 3); cout << string(15, ' ');
+						gotoxy(10, 1); c(4); cout << "No results found."; c(7);
+						Sleep(500);
+						gotoxy(10, 1); cout << string(25, ' '); // Clear message
 					}
 				}
 				else {
-					gotoxy(80, 5); cout << "Unable to open file!" << endl;
+					gotoxy(80, 1); cout << "Unable to open file!";
 					Sleep(500);
-					gotoxy(80, 5); cout << string(25, ' ');
+					gotoxy(80, 1); cout << string(25, ' ');
 				}
 				break;
 			}
@@ -1237,7 +1314,7 @@ M:
 		break;
 	case 1:
 		hc(1);
-		c(4); button(60, 5, 15, "", 0); // edit
+		c(4); button(10, 5, 15, "", 0); // edit
 		switch (_getch()) {
 		case 224:
 			switch (_getch()) {
@@ -1268,7 +1345,7 @@ M:
 		break;
 	case 2:
 		hc(1);
-		c(4); button(80, 5, 15, "", 0); // delete
+		c(4); button(30, 5, 15, "", 0); // delete
 		switch (_getch()) {
 		case 224:
 			switch (_getch()) {
@@ -1299,7 +1376,7 @@ M:
 		break;
 	case 3:
 		hc(1);
-		c(4); button(100, 5, 14, "", 0); // BACK
+		c(4); button(50, 5, 14, "", 0); // BACK
 		switch (_getch()) {
 		case 224:
 			switch (_getch()) {
@@ -1413,6 +1490,7 @@ A:
 			}
 			else {
 			confi:
+				hc(1);
 				gotoxy(15, 4); cout << "Do want to add more books?";
 
 				c(7); button(15, 5, 10, "yes", 0);
@@ -1445,7 +1523,7 @@ A:
 					break;
 				case 13:
 					if (acount == 1) {
-						y++;
+						p++;
 						goto t;
 					}
 					else goto e;
