@@ -36,7 +36,7 @@ start:
     gotoxy(65, 16); cout << "Password: ";
 
 Login:
-    hc(0);
+    hc(0);// pang hide ng cursor(1 == hide, 0 == visible)
     gotoxy(76, 13);
     for (int i = 0;;) { // Login security for username
         a = _getch();
