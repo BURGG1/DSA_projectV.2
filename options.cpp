@@ -145,7 +145,6 @@ void search() { // goods na (SEARCH!)
 		Record.close();
 	}
 
-
 M: 
 	gotoxy(70, 2); cout << char(218) << string(37, char(196)) << char(191);
 	gotoxy(70, 3); cout << char(179);
@@ -163,6 +162,13 @@ M:
 			d = _getch();
 			if (d == -32) {
 				d = _getch();
+				searchbook = "";
+				hc(1);
+				for (int x = 0; x < 4; ++x) {
+					gotoxy(80, 5 + x);
+					cout << string(20, ' '); // Clear suggestion area
+				}
+				hc(0);
 				if (d == 72 || d == 75) {
 					counter = 1;
 					break;
@@ -193,7 +199,7 @@ M:
 					gotoxy(80, 5 + x);
 					cout << string(20, ' '); // Clear suggestion area
 				}
-				x = 0; // Reset x for displaying suggestions
+				x = 0; // Reset x for display
 				for (const auto& suggestion : filtered) {
 					gotoxy(80, 5 + x);
 					cout << suggestion; // Display suggestion
@@ -258,6 +264,7 @@ M:
 		goto M;
 		break;
 	case 1:
+	b:
 		hc(1);
 		c(4); button(100, 5, 14, "", 0); // BACK
 		switch (_getch()) {
@@ -275,6 +282,8 @@ M:
 		case 13:
 			return;
 			break;
+		default:
+			goto b;
 		}
 		hc(0);
 		break;
