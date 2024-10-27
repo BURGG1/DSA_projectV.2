@@ -2122,7 +2122,7 @@ void returnb(string t, string& search) {
 	return;
 }
 
-void Relete() { // goods na (SEARCH!)
+void Relete() {
 
 	system("cls");
 	table(5, 1, 3, 1);
@@ -2373,8 +2373,6 @@ void view_allRent() { // not done yet tho goods nadin
 	}
 	table(h + (y - 1), 1, 3, 1);
 m:
-
-	/*returnBook();*/
 	/*hc(1);*/
 	//c(7); button(4, 5, 14, "A-Z", 0);
 	//c(7); button(21, 5, 15, " Category", 0);
