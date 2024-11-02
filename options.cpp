@@ -609,7 +609,7 @@ a:
 	}
 }
 
-void edit(string s) { // goods na
+void edit(string& s) { // goods na
 	system("cls");
 	gotoxy(45, 16);
 	vector<Book>tempb;
@@ -624,7 +624,6 @@ void edit(string s) { // goods na
 	string line;
 	int y = 0;
 	if (Record.is_open()) {
-
 		while (getline(Record, line)) {
 			stringstream ss(line);
 			getline(ss, title, '\t');
@@ -717,6 +716,7 @@ confi:
 					if (ecounter < 1) ecounter = 6;
 					else ecounter--;
 				}
+				else if (b == 12)ecounter = 1;
 				else ecounter++;
 				goto s;
 				break;
@@ -725,6 +725,7 @@ confi:
 				gotoxy(28, 18); cout << string(20, ' ');
 				gotoxy(28, 18); cout << nauthor;
 				if (b == 10) ecounter--;
+				else if (b == 12)ecounter = 2;
 				else ecounter++;
 				goto s;
 				break;
@@ -733,6 +734,7 @@ confi:
 				gotoxy(52, 18); cout << string(8, ' ');
 				gotoxy(52, 18); cout << navailability;
 				if (b == 10) ecounter--;
+				else if (b == 12)ecounter = 3;
 				else ecounter++;
 				goto s;
 				break;
@@ -741,6 +743,7 @@ confi:
 				gotoxy(67, 18); cout << string(4, ' ');
 				gotoxy(67, 18); cout << nyear;
 				if (b == 10) ecounter--;
+				else if (b == 12)ecounter = 4;
 				else ecounter++;
 				goto s;
 				break;
@@ -749,6 +752,7 @@ confi:
 				gotoxy(82, 18); cout << string(13, ' ');
 				gotoxy(82, 18); cout << nlocation;
 				if (b == 10) ecounter--;
+				else if (b == 12)ecounter = 5;
 				else ecounter++;
 				goto s;
 				break;
@@ -757,6 +761,7 @@ confi:
 				gotoxy(102, 18); cout << string(13, ' ');
 				gotoxy(102, 18); cout << nisbn;
 				if (b == 10) ecounter--;
+				else if (b == 12)ecounter = 6;
 				else ecounter++;
 				goto s;
 				break;
@@ -1186,7 +1191,7 @@ M:
 		gotoxy(75, 13 + y); cout << string(21, ' ');
 		gotoxy(97, 13 + y); cout << string(20, ' ');
 	}
-	table(h + y, 1, 2, 0);
+	table(h, 1, 2, 0);
 
 	(7); button(10, 5, 15, "Edit", 0);
 	c(7); button(30, 5, 15, "Delete", 0);
@@ -1954,10 +1959,10 @@ void delRent(string& s) { //delete rent
 		getline(Record, duration)) {
 		tempstor.push_back({ bname, btitle, bauthor, duration });
 		if (bname == s) {
-			gotoxy(12, 14); cout << bname;
-			gotoxy(40, 14); cout << btitle;
-			gotoxy(71, 14); cout << bauthor;
-			gotoxy(101, 14); cout << duration;
+			gotoxy(12, 12); cout << bname;
+			gotoxy(40, 12); cout << btitle;
+			gotoxy(71, 12); cout << bauthor;
+			gotoxy(101, 12); cout << duration;
 		}
 	}
 	Record.close();
@@ -2040,7 +2045,7 @@ void returnb(string t, string& search) { // return book
 		}
 	}
 	Record.close();
-
+	hc(0);
 	gotoxy(10, 2); cout << char(218) << string(39, char(196)) << char(191);
 	gotoxy(10, 3); cout << char(179);
 	gotoxy(11, 3); cout << "How long do you borrowed the book:" << char(179);
@@ -2126,7 +2131,7 @@ void returnb(string t, string& search) { // return book
 }
 
 void Relete() { // return tas delete HAHAHAHAHAH
-
+a:
 	system("cls");
 	table(5, 1, 3, 1);
 	char d;
@@ -2218,7 +2223,7 @@ M:
 				gotoxy(80 + j, 3);
 			}
 			else if (d == 13) { // Enter key
-
+				counter = 0;
 				for (int x = 0; x < 4; ++x) {
 					gotoxy(80, 5 + x);
 					cout << string(20, ' '); // Clear suggestion area
@@ -2254,9 +2259,9 @@ M:
 					searchName = "";
 					records.close();
 					if (!found) {
-						gotoxy(10, 5); c(4); cout << "No results found."; c(7);
+						gotoxy(10, 3); c(4); cout << "No results found."; c(7);
 						Sleep(500);
-						gotoxy(10, 5); cout << string(25, ' '); // Clear message
+						gotoxy(10, 3); cout << string(25, ' '); // Clear message
 					}
 				}
 				else {
@@ -2264,9 +2269,9 @@ M:
 					Sleep(500);
 					gotoxy(80, 5); cout << string(25, ' ');
 				}
-
+				break;
 			}
-		}
+		}		
 		goto M;
 		break;
 	case 1: // return
@@ -2285,8 +2290,17 @@ M:
 			goto M;
 			break;
 		case 13:
-			returnb(tempdur, search);
-			break;
+			if (search != "") {
+				returnb(tempdur ,search);
+				goto a;
+			}
+			else {
+				gotoxy(5, 2); cout << "ERROR! you must search a book first!";
+				Sleep(1000);
+				gotoxy(5, 2); cout << string(40, ' ');
+				counter = 0;
+				goto M;
+			}
 		}
 		goto M;
 		break;
@@ -2306,8 +2320,17 @@ M:
 			goto M;
 			break;
 		case 13:
-			delRent(search);
-			break;
+			if (search != "") {
+				delRent(search);
+				goto a;
+			}
+			else {
+				gotoxy(5, 2); cout << "ERROR! you must search a book first!";
+				Sleep(1000);
+				gotoxy(5, 2); cout << string(40, ' ');
+				counter = 0;
+				goto M;
+			}
 		}
 		goto M;
 		break;
