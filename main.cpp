@@ -1,10 +1,10 @@
 #include <iostream>
 #include <fstream>
-#include <gotoxy.h>
 #include "options.cpp"
 
 using namespace std;
 
+#include "package.h"
 
 int main() {
     int size = 0, s = 0;
